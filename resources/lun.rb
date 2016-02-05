@@ -20,7 +20,7 @@
 actions :create, :delete
 default_action :create
 
-attribute :name, :kind_of => String, :required => true, :name_attribute => true #qtree
+attribute :name, :kind_of => String, :required => true, :name_attribute => true #lun
 attribute :volume, :kind_of => String, :required => true
 attribute :svm, :kind_of => String, :required => true
 attribute :size_mb, :kind_of => Integer, :required => true
