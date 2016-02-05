@@ -32,3 +32,4 @@ attribute :comment, :kind_of => String
 attribute :qos_policy_group, :kind_of => String # Requires a valid, existing QOS Policy Name
 attribute :prefix_size, :kind_of => String # Used to configure the offset of the partition start
 attribute :space_reservation_enabled, :kind_of => [TrueClass, FalseClass]
+attribute :force, :kind_of => [TrueClass, FalseClass]

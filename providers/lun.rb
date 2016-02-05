@@ -62,15 +62,24 @@ action :create do
 end
 
 action :delete do
+  #validations.
+  raise ArgumentError, "Attribute name is required for lun mapping" unless new_resource.name
+  raise ArgumentError, "Attribute svm is required for lun mapping" unless new_resource.svm
+  raise ArgumentError, "Attribute volume is required for lun mapping" unless new_resource.volume
 
   # Create API Request.
   netapp_lun_api = netapp_hash
 
-  netapp_lun_api[:api_name] = "lun-delete"
+  netapp_lun_api[:api_name] = "lun-destroy"
   netapp_lun_api[:resource] = "lun"
   netapp_lun_api[:action] = "delete"
   netapp_lun_api[:svm] = new_resource.svm
-  netapp_lun_api[:api_attribute]["lun"] = new_resource.name
+
+  # Configure the expected Lun Path attribute
+  new_lun_path = "/vol/#{new_resource.volume}"
+  new_lun_path+="/#{new_resource.qtree}" unless new_resource.qtree.nil?
+  netapp_lun_api[:api_attribute]["path"] = "#{new_lun_path}/#{new_resource.name}"
+
   netapp_lun_api[:api_attribute]["force"] = new_resource.force unless new_resource.force.nil?
 
   # Invoke NetApp API.
