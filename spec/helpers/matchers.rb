@@ -120,4 +120,12 @@ if defined?(ChefSpec)
   def delete_netapp_igroup(resource_name)
     ChefSpec::Matchers::ResourceMatcher.new('netapp_igroup', :delete, resource_name)
   end
+  # Add support for Lun Map tests
+  def create_netapp_lun_map(resource_name)
+    ChefSpec::Matchers::ResourceMatcher.new('netapp_lun_map', :create, resource_name)
+  end
+
+  def delete_netapp_lun_map(resource_name)
+    ChefSpec::Matchers::ResourceMatcher.new('netapp_lun_map', :delete, resource_name)
+  end
 end
