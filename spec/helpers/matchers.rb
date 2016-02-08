@@ -111,4 +111,13 @@ if defined?(ChefSpec)
   def delete_netapp_lun(resource_name)
     ChefSpec::Matchers::ResourceMatcher.new('netapp_lun', :delete, resource_name)
   end
+
+  # Add support for Igroup tests
+  def create_netapp_igroup(resource_name)
+    ChefSpec::Matchers::ResourceMatcher.new('netapp_igroup', :create, resource_name)
+  end
+
+  def delete_netapp_igroup(resource_name)
+    ChefSpec::Matchers::ResourceMatcher.new('netapp_igroup', :delete, resource_name)
+  end
 end
