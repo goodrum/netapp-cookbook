@@ -102,4 +102,13 @@ if defined?(ChefSpec)
   def delete_netapp_volume(resource_name)
     ChefSpec::Matchers::ResourceMatcher.new('netapp_volume', :delete, resource_name)
   end
+
+  # Add support for Lun tests
+  def create_netapp_lun(resource_name)
+    ChefSpec::Matchers::ResourceMatcher.new('netapp_lun', :create, resource_name)
+  end
+
+  def delete_netapp_lun(resource_name)
+    ChefSpec::Matchers::ResourceMatcher.new('netapp_lun', :delete, resource_name)
+  end
 end
