@@ -128,4 +128,13 @@ if defined?(ChefSpec)
   def delete_netapp_lun_map(resource_name)
     ChefSpec::Matchers::ResourceMatcher.new('netapp_lun_map', :delete, resource_name)
   end
+  
+  # Add support for Igroup Initiator tests
+  def add_netapp_igroup_initiators(resource_name)
+    ChefSpec::Matchers::ResourceMatcher.new('netapp_igroup_initiators', :add, resource_name)
+  end
+
+  def remove_netapp_igroup_initiators(resource_name)
+    ChefSpec::Matchers::ResourceMatcher.new('netapp_igroup_initiators', :remove, resource_name)
+  end
 end
