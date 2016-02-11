@@ -415,6 +415,167 @@ netapp_role '/bar' do
 end
 ````
 
+netapp_lun
+------------
+SVM-management of lun creation, modification and deletion. Luns are a special file type created in a volume that acts as a virtual SCSI device for SAN (ISCSI and FCP) connected hosts.
+
+### Actions ###
+This resource has the following actions:
+
+* `:create` Default. Ensures the Lun is in this state.
+* `:delete` Removes the Lun
+
+### Attributes ###
+This resource has the following attributes:
+
+* `name` name attribute. The name of the Lun. **Required**
+* `svm` Name of managed SVM. **Required**
+* `volume` Name of the volume in which to create the Lun. **Required**.
+* `qtree` Name of the selected volume qtree in which to create the Lun.
+* `size_mb` Actual size of the Lun in Megabytes *(MB)*. **Required**
+* `ostype` SAN host version to which the Lun will be connected.  **Required**
+* `comment` Description text for the Lun. 
+* `qos_policy_group` Existing QOS Policy to apply to the Lun. 
+* `prefix_size` Manual offset for the Lun's starting partition. Advance user feature
+* `space_reservation_enabled` True or False. If true then the Lun will consume 100% of the space on disk,
+otherwise the size consumed on disk is directly related to the amount of data in the Lun.
+* `force` True or false
+
+### Example ###
+
+````ruby
+netapp_lun 'data.lun' do
+  svm 'vs1.example.com'
+  volume 'foo'
+  size_mb 1024
+  ostype 'windows_2008'
+  action :create
+end
+````
+
+````ruby
+netapp_lun 'data.lun' do
+  svm 'vs1.example.com'
+  volume 'foo'
+  action :delete
+end
+````
+
+netapp_lun_map
+------------
+SVM-management of lun mapping and unmapping to initiator groups. Luns are a special file type created in a volume that acts as a virtual SCSI device for SAN (ISCSI and FCP) connected hosts.
+
+### Actions ###
+This resource has the following actions:
+
+* `:create` Default. Ensures the Lun Mapping is in this state.
+* `:delete` Removes the Lun Mapping
+
+### Attributes ###
+This resource has the following attributes:
+
+* `name` name attribute. The name of the Lun. **Required**
+* `igroup` existing initiator group to which the Lun should be mapped. **Required**
+* `svm` Name of managed SVM. **Required**
+* `volume` Name of the volume in which to create the Lun. **Required**.
+* `qtree` Name of the selected volume qtree in which to create the Lun.
+* `lun_id` Lun identification number. Default will choose the next lowest number starting with 0
+* `force` True or false
+
+### Example ###
+
+````ruby
+netapp_lun_map 'data.lun' do
+  svm 'vs1.example.com'
+  volume 'foo'
+  igroup 'windows_host'
+  action :create
+end
+````
+
+````ruby
+netapp_lun_map 'data.lun' do
+  svm 'vs1.example.com'
+  volume 'foo'
+  igroup 'windows_host'
+  action :delete
+end
+````
+
+netapp_igroup
+------------
+SVM-management of initiator group (igroup) creation, modification and deletion. Igroups allow for the mapping of Host intiators to NetApp Luns for use with SAN protocols (ISCSI and FCP).
+
+### Actions ###
+This resource has the following actions:
+
+* `:create` Default. Ensures the Igroup is in this state.
+* `:delete` Removes the Igroup
+
+### Attributes ###
+This resource has the following attributes:
+
+* `name` name attribute. The name of the Lun. **Required**
+* `type` ["iscsi", "fcp", "mixed"] .**Required**
+* `svm` Name of managed SVM. **Required**
+* `ostype` SAN host version to which the Lun will be connected.  **Required**
+* `bind_portset` Existing Igroup Portset name
+* `force` True or false
+
+### Example ###
+
+````ruby
+netapp_igroup 'windows_host' do
+  svm 'vs1.example.com'
+  type 'iscsi'
+  ostype 'windows'
+  action :create
+end
+````
+
+````ruby
+netapp_igroup 'windows_host' do
+  svm 'vs1.example.com'
+  action :delete
+end
+````
+
+netapp_igroup_initiators
+------------
+SVM-management of initiators in an initiator group (igroup) addition and removal. Igroups allow for the mapping of Host intiators to NetApp Luns for use with SAN protocols (ISCSI and FCP).
+
+### Actions ###
+This resource has the following actions:
+
+* `:add` Default. Ensures the Initiator is associated with the Igroup
+* `:remove` Removes the Initiator from the Igroup
+
+### Attributes ###
+This resource has the following attributes:
+
+* `name` name attribute. The name of the Lun. **Required**
+* `initiator` Initiator address (IQN for ISCSI or WWPN for FCP) .**Required**
+* `svm` Name of managed SVM. **Required**
+* `force` True or false
+
+### Example ###
+
+````ruby
+netapp_igroup_initiators 'windows_host' do
+  svm 'vs1.example.com'
+  initiator 'iqn.XXXXXXXXXX'
+  action :create
+end
+````
+
+````ruby
+netapp_igroup_initiators 'windows_host' do
+  svm 'vs1.example.com'
+  initiator 'iqn.XXXXXXXXXX'
+  force true
+  action :delete
+end
+````
 
 Contributing
 ------------
