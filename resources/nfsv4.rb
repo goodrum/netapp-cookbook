@@ -17,20 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-actions :enable, :disable, :add_rule, :modify_rule, :delete_rule
+actions :enable, :disable
 default_action :enable
 
 attribute :svm, :kind_of => String, :required => true, :name_attribute => true
-
-attribute :anonymous_user, :kind_of => String
-attribute :client_match, :required => true, :kind_of => String
-attribute :chown_mode, :kind_of => String, :equal_to => ["restricted", "unrestricted"], :default => "restricted"
-attribute :ntfs_unix_security_ops, :kind_of => String, :equal_to => ["ignore", "fail"], :default => "fail"
-attribute :allow_dev, :kind_of => [TrueClass, FalseClass]
-attribute :allow_set_uid, :kind_of => [TrueClass, FalseClass]
-attribute :policy_name, :required => true, :kind_of => String
-attribute :rule_index, :kind_of => Integer
-attribute :access_protocol, :required => true, :kind_of => String, :equal_to => ["any", "nfs2","nfs3","nfs","cifs","nfs4","flexcache"]
-attribute :ro_rule, :required => true, :kind_of => String, :equal_to => ["any", "none","never","krb5","krb5i","ntlm","sys"]
-attribute :rw_rule, :required => true, :kind_of => String, :equal_to => ["any", "none","never","krb5","krb5i","ntlm","sys"]
-attribute :root_rule, :kind_of => String, :equal_to => ["any", "none","never","krb5","krb5i","ntlm","sys"]

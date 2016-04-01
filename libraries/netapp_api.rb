@@ -65,6 +65,18 @@ module NetApp
       check_errors!(response, api_hash[:resource], api_hash[:action])
     end
 
+    def return_output(api_hash)
+      request = generate_request(api_hash[:api_name], api_hash[:api_attribute])
+      if api_hash[:svm].empty?
+        response = invoke_api(request)
+      else
+        response = invoke_api(request, api_hash[:svm])
+      end
+      if check_errors!(response, api_hash[:resource], api_hash[:action])
+        response
+      end  
+    end
+
     def invoke_api(request, svm = nil)
       @server = connect
 
