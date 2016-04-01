@@ -61,6 +61,40 @@ action :create do
   new_resource.updated_by_last_action(true) if resource_update
 end
 
+action :mount do
+  # The state of volume should be offline before deleting the volume.
+  # Change the state of volume to offline from online.
+  netapp_volume_mount_api = netapp_hash
+
+  netapp_volume_mount_api[:api_name] = "volume-mount"
+  netapp_volume_mount_api[:resource] = "volume"
+  netapp_volume_mount_api[:action] = "unmount"
+  netapp_volume_mount_api[:svm] = new_resource.svm
+  netapp_volume_mount_api[:api_attribute]["volume-name"] = new_resource.name
+  netapp_volume_mount_api[:api_attribute]["junction-path"] = new_resource.junction_path
+
+  # Invoke NetApp API for volume offine.
+  resource_update = invoke(netapp_volume_mount_api)
+  new_resource.updated_by_last_action(true) if resource_update
+end  
+
+action :unmount do
+  # The state of volume should be offline before deleting the volume.
+  # Change the state of volume to offline from online.
+  netapp_volume_unmount_api = netapp_hash
+
+  netapp_volume_unmount_api[:api_name] = "volume-unmount"
+  netapp_volume_unmount_api[:resource] = "volume"
+  netapp_volume_unmount_api[:action] = "unmount"
+  netapp_volume_unmount_api[:svm] = new_resource.svm
+  netapp_volume_unmount_api[:api_attribute]["volume-name"] = new_resource.name
+  netapp_volume_unmount_api[:api_attribute]["force"] = true
+
+  # Invoke NetApp API for volume offine.
+  resource_update = invoke(netapp_volume_unmount_api)
+  new_resource.updated_by_last_action(true) if resource_update
+end  
+
 action :delete do
 
   # The state of volume should be offline before deleting the volume.

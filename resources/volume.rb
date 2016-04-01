@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-actions :create, :delete
+actions :create, :delete, :mount, :unmount
 default_action :create
 
 attribute :name, :kind_of => String, :required => true, :name_attribute => true

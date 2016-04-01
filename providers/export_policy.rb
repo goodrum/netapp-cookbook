@@ -33,7 +33,7 @@ action :create do
   new_resource.updated_by_last_action(true)
 end
 
-action :disable do
+action :delete do
   # Create API Request.
   netapp_export_policy_api = netapp_hash
 
