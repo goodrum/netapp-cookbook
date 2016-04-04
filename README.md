@@ -34,8 +34,22 @@ or
     ['netapp']['fqdn'] string
     ['netapp']['vserver'] string
     ['netapp']['asup'] boolean, default is 'true'.
+or _Optional_ - **Encrypted Data Bag**
+
+    ['netapp']['fqdn'] string
+    ['netapp']['passwords']['secret_path'] string, Encrypted Data Bag key
+    ['netapp']['secret_credentials'] string, Data bag item name. **Data Bag name must be _netapp_**
+    ['netapp']['https'] boolean, default is 'true'.
+    ['netapp']['vserver'] string
+    ['netapp']['asup'] boolean, default is 'true'.
 
 The ASUP option, if set to 'true', will cause a log message to be sent to the storage cluster. This log message will be included in ASUP bundles that are sent back to NetApp, if configured to do so on the system. If ASUP is not enabled on the system or on the attribute listed above, no log message will be sent to NetApp.
+
+Storage Virtual Machine authentication
+-----------------
+ Support for direct Storage Virtual Machine (SVM) connections can be added by replacing the FQDN attribute with the SVM Management Interface (LIF) address.  Otherwise, the node attribute _vserver_ is used to pass-thru calls from the Cluster Management interface.
+
+**_vserver_ is not a required attribute when connecting directly to the Storage Virtual Machine**
 
 NetApp Resources
 ================
@@ -378,6 +392,144 @@ end
 netapp_export '/vol/vol1' do
   svm 'vs1.example.com'
   action :delete
+end
+````
+
+netapp_nfsv4
+----------
+SVM-management of NFSv4 services on the selected Storage Virtual Machine.
+
+You do not need to enter any information to configure NFS on the SVM. The NFS configuration is created when you specify the protocol value as `nfs`.
+
+### Actions ###
+This resource has the following actions:
+
+* `:enable` Default. Ensures that the Storage Virtual Machine is running NFSv4.0 and NFSv4.1 services.
+* `:disable` Disables and Stops NFSv4.0 and NFSv4.1 services on the Storage Virtual Machine
+
+### Attributes ###
+This resource has the following attributes:
+* `svm` string, name attribute. Name of managed SVM. Required
+
+### Example ###
+
+````ruby
+netapp_nfsv4 'vs1.example.com' do
+  action :enable
+end
+````
+
+````ruby
+netapp_nfsv4 'vs1.example.com' do
+  action :disable
+end
+````
+
+netapp_export_policy
+----------
+Management of Export Policies for Storage Virtual Machines
+
+### Actions ###
+This resource has the following actions:
+
+* `:create` Default. Ensures that an Export Policy exists.
+* `:delete` Removes the Export Policy
+
+### Attributes ###
+This resource has the following attributes:
+* `policy_name` string, name attribute. Required
+* `svm` string. Name of managed SVM. Required
+
+### Example ###
+
+````ruby
+netapp_export_policy 'my_nfs_export' do
+  svm 'vs1.example.com'
+  action :create
+end
+````
+
+````ruby
+netapp_export_policy 'my_nfs_export' do
+  svm 'vs1.example.com'
+  action :delete
+end
+````
+
+netapp_export_rule
+----------
+Management of Export Rules and Client Matches for Export Policies within a Storage Virtual Machine
+
+### Actions ###
+This resource has the following actions:
+
+* `:create` Default. Ensures that an Export Rule exists in the Policy
+* `:modify` Changes or updates an Export Rule in the Policy
+* `:delete` Removes the Export Rule from the Policy
+
+### Attributes ###
+This resource has the following attributes:
+
+######Required Attributes######
+
+* `policy_name` string. **Required**
+* `svm` string. Name of managed SVM. **Required**
+
+######Required for :create, :modify, :delete######
+
+* `client_match` string. **Required for :create, :modify, :delete** _(For Modify and Delete, can be substituted with RuleIndex)_
+
+###### Required for :create ######
+
+* `ro_rule` string. ReadOnly authentication model. **Required for :create** _(Valid options ["any", "none","never","krb5","krb5i","ntlm","sys"] )_
+* `rw_rule` string. ReadWrite authentication model. **Required for :create** _(Valid options ["any", "none","never","krb5","krb5i","ntlm","sys"] )_
+* `access_protocol` string. Network Access Protocol. **Required for :create** _(Valid options ["any", "nfs2","nfs3","nfs","cifs","nfs4","flexcache"] )_
+
+###### Required for :modify, :delete ######
+
+* `rule_index` string. **Required for :modify, :delete** _(For Modify and Delete, can be substituted with ClientMatch)_
+
+###### Optional Attributes ######
+
+* `anonymous_user` string. Unix user mapping for anonymous access.
+* `chown_mode` string. Default _restricted_ _(Valid options ["restricted", "unrestricted"] )_
+* `ntfs_unix_security_ops` string. Default fail _(Valid options ["ignore", "fail"] )_
+* `allow_dev` boolean. 
+* `allow_set_uid` boolean. 
+* `root_rule` string. Root authentication model. _(Valid options ["any", "none","never","krb5","krb5i","ntlm","sys"] )_
+
+
+### Example ###
+
+````ruby
+netapp_export_rule "Create rule for 10.0.0.0/24" do
+  svm "vs1.example.com"
+  policy_name "my_nfs_export"
+  client_match "10.0.0.0/24"
+  access_protocol "nfs"
+  ro_rule "sys"
+  rw_rule "sys"
+  root_rule "sys"
+    action :create
+end
+````
+
+````ruby
+netapp_export_rule "Modify rule for 10.0.0.0/24" do
+  svm "vs1.example.com"
+  policy_name "my_nfs_export"
+  client_match "10.0.0.0/24"
+  root_rule "none"
+    action :modify
+end
+````
+
+````ruby
+netapp_export_rule "Delete rule for 10.0.0.0/24" do
+  svm "vs1.example.com"
+  policy_name "my_nfs_export"
+  client_match "10.0.0.0/24"
+    action :delete
 end
 ````
 

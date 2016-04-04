@@ -27,13 +27,35 @@ module NetApp
         redacted_url = "#{@url.scheme.downcase}://#{@url.host}:#{@url.port}/#{@vfiler if @vfiler}"
 
       else
-        raise ArgumentError, "no user specified" unless node['netapp']['user']
-        raise ArgumentError, "no password specified" unless node['netapp']['password']
         raise ArgumentError, "no host specified" unless node['netapp']['fqdn']
+
+        # Update to Authentication mechanism - 2016-04-04
+        #
+        # Added a check to see if the node attribute for the Data Bag item was passed.  In this case,
+        # we will pass the credentials to the NaServer.rb file as the variables 'netapp_user' and 
+        # 'netapp_password'.  To support legacy connection models, we left support for the node attributes
+        # node[netapp][user] and node[netapp][password] and will fail back if the Data Bag item is not passed.
+        #
+        if node['netapp']['secret_credentials']
+          raise ArgumentError, "no data bag item specified" unless node['netapp']['secret_credentials']
+          # The node attribute [netapp][passwords][secret_path] is used to determine the location of the encrypted_bag
+          # secret file and is used to decrypt the username and password.
+          password_secret = Chef::EncryptedDataBagItem.load_secret("#{node['netapp']['passwords']['secret_path']}")
+          netapp_password_data_bag_item = Chef::EncryptedDataBagItem.load('netapp', node['netapp']['secret_credentials'], password_secret)
+
+          netapp_user = netapp_password_data_bag_item['username']
+          netapp_password = netapp_password_data_bag_item['password']
+        else
+          # Legacy authentication support for situations that leverage the node attributes fro authentication credentials.
+          raise ArgumentError, "no user specified" unless node['netapp']['user']
+          raise ArgumentError, "no password specified" unless node['netapp']['password']
+          netapp_user = node['netapp']['user']
+          netapp_password = node['netapp']['password']
+        end  
 
         @server = NaServer.new(node['netapp']['fqdn'], 1, 13)
         @server.set_application_name('Chef')
-        @server.set_admin_user(node['netapp']['user'], node['netapp']['password'])
+        @server.set_admin_user(netapp_user, netapp_password)
         @server.set_timeout(node['netapp']['api']['timeout']) if node['netapp']['api']['timeout']
         @server.set_vfiler(node['netapp']['vserver']) if node['netapp']['vserver']
 
